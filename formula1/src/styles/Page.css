@@ -1,358 +1,414 @@
-article {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 1em;
+/* ============================================================
+   PAGE.CSS — Layouts gerais de páginas
+   ============================================================ */
+
+/* ---- Section principal (wrapper das páginas) ---- */
+section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: calc(100vh - var(--header-height) - 120px);
+    width: 100%;
+    background-color: var(--color-bg);
+    padding-bottom: var(--space-16);
 }
 
-button {
-  /* Your default button styles */
-  transform: scale(1); /* Ensure a default scale */
-  transition: transform 0.3s ease; /* Smooth transition for all states */
+/* ---- Carrossel da Home ---- */
+.carousel-wrapper {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: var(--color-text-primary);
 }
 
-button:active {
-  transform: scale(0.9); /* Slightly decrease the size */
-  transition: transform 0.1s ease; /* Quick transition when active */
+.carousel-wrapper img {
+    width: 100%;
+    height: 65vh;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: opacity 0.6s ease;
 }
 
-/* If you want it to snap back immediately after :active */
-button:not(:active) {
-  transition: transform 0.3s ease; /* Transition back when not active */
+.carousel-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 40%,
+        rgba(33, 37, 41, 0.6) 100%
+    );
+    pointer-events: none;
 }
 
-.profile {
-  display : flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  gap: 2.5em;
-  align-items: center;
-  flex-wrap: wrap;
-
-  p {
-    width: 35vw;
-    text-align: justify;
-  }
+/* ---- Controles do carrossel ---- */
+.carousel-dots {
+    position: absolute;
+    bottom: var(--space-5);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-2);
+    z-index: 2;
 }
 
-.profile-image {
-  width: 25vw;
-  height: 25vw;
-  border-radius: 2.5em;
-  margin-bottom: 1em;
-  object-fit: cover;
-  object-position: top;
-}
-
-.ContactUs {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 1.5em;
-  background-color: #21212c;
-  width: 100%;
-  padding-bottom: 2em;
-
-  p {
-    color: aliceblue;
-  }
-  h3, h2 {
-    color: aliceblue;
-  }
-}
-
-.LoginMessage {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  align-items: center;
-  margin: 1.5em;
-  background-color: #21212c;
-  width: 100%;
-  padding-top: 1em;
-  padding-bottom: 1em;
-
-  p {
-    color: aliceblue;
-  }
-  h3, h1 {
-    color: aliceblue;
-    max-width: 90vw;
-  }
-  .LoginButton {
-    background-color: #007bff;
-    color: white;
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.5);
     border: none;
-    border-radius: 5px;
     cursor: pointer;
-    width: 7.5em;
+    padding: 0;
+    transition: background-color var(--transition-base), width var(--transition-base);
+}
 
-    a {
-      color: white;
-      text-decoration: none;
-    }
-  }
+.carousel-dot.active {
+    background: #FFFFFF;
+    width: 24px;
+}
 
-  .LoginButton.Delete{
-    background-color: #e10600;
-    width: 10em;
-  }
+/* ---- Área de conteúdo da Home ---- */
+.home-content {
+    width: 100%;
+    max-width: var(--max-width);
+    margin-inline: auto;
+    padding: var(--space-10) var(--space-6);
+}
 
-  .LoginButton.Register{
-    background-color: #28a745;
-  }
+.home-content .page-title {
+    font-size: var(--text-4xl);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-8);
+    letter-spacing: -0.02em;
+    padding: 0;
+}
 
-  .buttons{
+/* ---- Parágrafos de conteúdo ---- */
+.content-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    max-width: 860px;
+}
+
+.content-body p {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+    text-align: justify;
+}
+
+/* ---- Auth Gate (login required) ---- */
+.LoginMessage {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-6);
+    width: 100%;
+    max-width: var(--max-width);
+    padding: var(--space-8) var(--space-6);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    margin: var(--space-8) var(--space-6);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+}
+
+.LoginMessage h3,
+.LoginMessage h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    max-width: 90vw;
+}
+
+.LoginMessage.Block {
+    min-height: 45vh;
+    margin: var(--space-8) auto;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: 600px;
+}
+
+.LoginMessage.Block h1 {
+    font-size: var(--text-4xl);
+    color: var(--color-accent);
+    border-bottom: 3px solid var(--color-accent);
+    padding-bottom: var(--space-3);
+}
+
+.LoginMessage.Block h3 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text-muted);
+    max-width: 440px;
+}
+
+.buttons {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1em;
-  }
-}
-.LoginMessage.Block{
-  min-height: 40vh;
-  margin: 5em;
+    gap: var(--space-3);
 }
 
-section {
-  color: aliceblue;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  min-width: 100%;
-  position: relative;
+/* Botões de login/register no contexto de página */
+.LoginButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    color: #FFFFFF;
+    background-color: var(--color-info);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-bounce),
+        box-shadow var(--transition-fast);
+    text-decoration: none;
+    min-height: 40px;
+    min-width: 100px;
+}
 
-  .title {
-    padding: 1em;
-  }
+.LoginButton a {
+    color: #FFFFFF;
+    text-decoration: none;
+}
 
-  p {
-    width: 75vw;
-  }
+.LoginButton:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
 
-  .divRaces {
-    width: 25vw;
-    background-image: url("..//assets/effect.png");
-    background-size: cover;
-    background-position: auto;
-    background-color: #21212c;
-    border-radius: 1em;
-    border: aliceblue 0.75em solid;
-    margin: 1em;
-    text-align: center;
-    box-shadow: #21212c 1.2em 1.2em 1.6em;
+.LoginButton:active {
+    transform: scale(0.97);
+}
 
+.LoginButton.Register {
+    background-color: var(--color-success);
+}
+
+.LoginButton.Register:hover {
+    background-color: #25854f;
+    box-shadow: 0 4px 12px rgba(45, 157, 94, 0.3);
+}
+
+.LoginButton.Delete {
+    background-color: var(--color-accent);
+    min-width: 130px;
+}
+
+.LoginButton.Delete:hover {
+    background-color: var(--color-accent-hover);
+    box-shadow: var(--shadow-accent);
+}
+
+/* ---- Seletor de ano (container) ---- */
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    width: 100%;
+    max-width: var(--max-width);
+    padding: var(--space-6) var(--space-6) var(--space-4);
+}
+
+.container select,
+.container .form-select {
+    height: 44px;
+    padding: 0 var(--space-10) 0 var(--space-4);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236C757D'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-3) center;
+    background-size: 18px;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-xs);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.container select:focus,
+.container .form-select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.12);
+}
+
+/* ---- Cards de sessão (article wrapper) ---- */
+article {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: var(--max-width);
+    padding: 0 var(--space-6);
+}
+
+/* ---- Profile (Contact page) ---- */
+.profile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-10);
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: var(--max-width);
+    padding: var(--space-8) var(--space-6);
+}
+
+.profile p {
+    width: 100%;
+    max-width: 520px;
+    text-align: left;
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+}
+
+.profile-image {
+    width: 240px;
+    height: 240px;
+    border-radius: var(--radius-xl);
+    object-fit: cover;
+    object-position: top;
+    box-shadow: var(--shadow-xl);
+    border: 4px solid var(--color-bg-secondary);
+    flex-shrink: 0;
+}
+
+/* ---- Contact section ---- */
+.ContactUs {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    p {
-      width: auto;
-      text-shadow: -1px 0 #15151fff, 0 1px black, 1px 0 #15151fff, 0 -1px #15151fff;
-      font-size: larger;
-      margin: 0%;
-      padding: 0.5em;
-    }
-  }
-}
-
-.container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
-
-  select {
-    border: aliceblue 0.25em solid;
-    background-color: #21212c;
-    border-radius: 1em;
-    color: aliceblue;
-    margin: 1em;
-  }
-}
-
-main {
-  text-align: justify;
-}
-
-.Carrousel {
-  width: 100%;
-
-  img {
     width: 100%;
-    height: 70vh;
-    object-fit: cover;
-    object-position: center;
-  }
+    max-width: 600px;
+    padding: var(--space-10) var(--space-6);
+    gap: var(--space-4);
 }
 
-
-@media screen and (max-width: 1624px) {
-  section {
-    p {
-      width: 80vw;
-    }
-
-    .divRaces {
-      width: 27.5vw;
-    }
-  }
-
-  .Carrousel {
-    img {
-      height: 65vh;
-    }
-  }
+.ContactUs h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
 }
 
-@media screen and (max-width: 1279px) {
-  .profile {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    p {
-      width: 80vw;
-    }
-  }
-
-  section {
-    p {
-      width: 90vw;
-    }
-
-    .divRaces {
-      width: 40vw;
-    }
-  }
-
-  .profile-image {
-    width: 60vw;
-    height: 60vw;
-  }
-
-
-  .Carrousel {
-    img {
-      height: 60vh;
-    }
-  }
+.ContactUs h3 {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--text-base);
 }
 
-@media screen and (max-width: 1024px) {
-  section {
-    p {
-      width: 90vw;
-    }
-
-    .divRaces {
-      width: 75vw;
-      box-shadow: none !important;
-    border: #21212c 0.75em solid;
-    }
-  }
-
-  main {
-    color:#21212c;
-  }
-
-  .Main {
-    color:#21212c;
-  }
-
-  .title{
-    color:#21212c;
-  }
-
-  .container {
-    select {
-      max-width: 35vw;
-    }
-  }
-
-  .Carrousel {
-    img {
-      height: 55vh;
-    }
-  }
-
-  .LoginMessage.Block{
-    min-height: 40vh;
-    margin: 2.5em;
-  }
+/* ---- Loading / Error ---- */
+.loading-message {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+    padding: var(--space-4);
+    text-align: center;
 }
 
-@media screen and (max-width: 768px) {
-  section {
-    p {
-      width: 90vw;
-    }
-
-    .divRaces {
-      width: 85vw;
-      box-shadow: none !important;
-    border: #21212c 0.75em solid;
-    }
-  }
-
-  .profile-image {
-    width: 70vw;
-    height: 70vw;
-    padding: 0%;
-    margin: 0%;
-  }
-
-  main {
-    color:#21212c;
-  }
-
-  .title{
-    color:#21212c;
-  }
-
-  .Carrousel {
-    img {
-      height: 45vh;
-    }
-  }
+.error {
+    color: var(--color-error);
+    background: var(--color-error-light);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
 }
 
-@media screen and (max-width: 480px) {
-  section {
-    p {
-      width: 90vw;
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width: 1024px) {
+    .profile {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .divRaces {
-      width: 85vw;
-      box-shadow: none !important;
-    border: #21212c 0.75em solid;
+    .profile p {
+        max-width: 90vw;
+        text-align: justify;
     }
-  }
 
-  main {
-    color:#21212c;
-  }
-
-  .title{
-    color:#21212c;
-  }
-
-  .container {
-    select {
-      max-width: 35vw;
+    .profile-image {
+        width: 200px;
+        height: 200px;
     }
-  }
+}
 
-  .Carrousel {
-    img {
-      height: 45vh;
+@media (max-width: 768px) {
+    .carousel-wrapper img {
+        height: 45vh;
     }
-  }
+
+    .home-content {
+        padding: var(--space-6) var(--space-4);
+    }
+
+    .home-content .page-title {
+        font-size: var(--text-3xl);
+    }
+
+    .container {
+        padding: var(--space-4) var(--space-4) var(--space-2);
+    }
+
+    .container select {
+        max-width: 60vw;
+    }
+
+    article {
+        padding: 0 var(--space-4);
+    }
+
+    .LoginMessage {
+        margin: var(--space-4);
+        padding: var(--space-6) var(--space-4);
+        border-radius: var(--radius-lg);
+    }
+
+    .LoginMessage.Block {
+        margin: var(--space-6) var(--space-4);
+    }
+
+    .profile-image {
+        width: 160px;
+        height: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-wrapper img {
+        height: 38vh;
+    }
+
+    .LoginButton {
+        width: 100%;
+    }
 }

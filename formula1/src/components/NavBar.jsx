@@ -1,134 +1,82 @@
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import "../styles/NavBar.css"
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import "../styles/NavBar.css";
+
+const NAV_ITEMS = [
+    { label: "Início",        path: "/" },
+    { label: "Treinos",       path: "/pratices" },
+    { label: "Sprints",       path: "/sprints" },
+    { label: "Corridas",      path: "/races" },
+    { label: "Qualificações", path: "/qualifying" },
+    { label: "Pilotos",       path: "/drivers" },
+    { label: "Chat",          path: "/chat" },
+    { label: "Sobre Mim",     path: "/contact" },
+];
+
 function NavBar() {
-    const [navbar, setNavbar] = useState(false);
-    const [widthSize, setWidthSize] = useState(window.screen.width)
+    const [menuOpen, setMenuOpen] = useState(false);
+    const location = useLocation();
 
-    useEffect(() => {
-        // Correção para evitar loop infinito e garantir que o intervalo limpe corretamente.
-        // O ideal é usar um event listener para 'resize' e não um setInterval.
-        const handleResize = () => {
-            const currentWidth = window.innerWidth; // Use innerWidth para a viewport
-            setWidthSize(currentWidth);
-            if (currentWidth < 1024) {
-                setNavbar(true);
-            } else {
-                setNavbar(false);
-            }
-        };
+    const isActive = (path) => {
+        if (path === "/") return location.pathname === "/";
+        return location.pathname.startsWith(path);
+    };
 
-        // Adiciona o event listener ao montar o componente
-        window.addEventListener('resize', handleResize);
-        // Chama uma vez para definir o estado inicial
-        handleResize();
-
-        // Limpa o event listener ao desmontar o componente
-        return () => window.removeEventListener('resize', handleResize);
-    }, [widthSize]); // Array de dependências vazio para rodar apenas uma vez ao montar/desmontar
-
+    const closeMenu = () => setMenuOpen(false);
 
     return (
-        <nav>
-            {navbar ? <>
-                <input type='checkbox' id="hamburger-trigger" />
-                <label htmlFor="hamburger-trigger"> {/* Corrigido 'for' para 'htmlFor' */}
-                    <svg className="svg" id="on" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"> {/* stroke-width para strokeWidth */}
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /> {/* stroke-linecap para strokeLinecap, etc. */}
-                    </svg>
+        <nav aria-label="Navegação principal">
+            {/* ---- Desktop: lista horizontal ---- */}
+            <ul className="nav-list" role="list">
+                {NAV_ITEMS.map((item) => (
+                    <li key={item.path} className="nav-item">
+                        <Link
+                            to={item.path}
+                            className={`nav-link ${isActive(item.path) ? "active" : ""}`}
+                            aria-current={isActive(item.path) ? "page" : undefined}
+                        >
+                            {item.label}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
 
-                    <svg id="off" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+            {/* ---- Mobile: botão hamburger ---- */}
+            <button
+                className={`nav-hamburger ${menuOpen ? "open" : ""}`}
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+                aria-expanded={menuOpen}
+                aria-controls="nav-mobile-menu"
+            >
+                <span className="hamburger-line" aria-hidden="true" />
+                <span className="hamburger-line" aria-hidden="true" />
+                <span className="hamburger-line" aria-hidden="true" />
+            </button>
 
-                </label> <ul id="options">
-                    <li>
-                        <Link to="/">
-                            <h3>Início</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/pratices">
-                            <h3>Treinos</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/sprints">
-                            <h3>Sprints</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                     <li>
-                        <Link to="/races">
-                            <h3>Corridas</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/qualifying">
-                            <h3>Qualificações</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/drivers">
-                            <h3>Pilotos</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/chat">
-                            <h3>Chat</h3> {/* Mantido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/contact">
-                            <h3>Sobre Mim</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                </ul></>
-                :
-                <ul>
-                    <li>
-                        <Link to="/">
-                            <h3>Início</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                      <li>
-                        <Link to="/pratices">
-                            <h3>Treinos</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/sprints">
-                            <h3>Sprints</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                     <li>
-                        <Link to="/races">
-                            <h3>Corridas</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/qualifying">
-                            <h3>Qualificações</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/drivers">
-                            <h3>Pilotos</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/chat">
-                            <h3>Chat</h3> {/* Mantido */}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/contact">
-                            <h3>Sobre Mim</h3> {/* Traduzido */}
-                        </Link>
-                    </li>
-                </ul>}
-
+            {/* ---- Mobile: menu fullscreen ---- */}
+            <div
+                id="nav-mobile-menu"
+                className={`nav-mobile-menu ${menuOpen ? "open" : ""}`}
+                aria-hidden={!menuOpen}
+            >
+                <ul className="nav-mobile-list" role="list">
+                    {NAV_ITEMS.map((item) => (
+                        <li key={item.path}>
+                            <Link
+                                to={item.path}
+                                className={`nav-mobile-link ${isActive(item.path) ? "active" : ""}`}
+                                aria-current={isActive(item.path) ? "page" : undefined}
+                                onClick={closeMenu}
+                            >
+                                {item.label}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </nav>
-    )
+    );
 }
 
 export default NavBar;

@@ -1,11 +1,11 @@
-/* eslint-disable no-unused-vars */
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import Loading from "../components/Loading.jsx";
 import SessionCard from "../components/SessionCard.jsx";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link } from "react-router-dom"; // Importar Link para os botões
-import { useAuth } from '../context/AuthContext.jsx'; // Importar useAuth
+import { Link } from "react-router-dom";
+import { useAuth } from '../context/AuthContext.jsx';
+import { Helmet } from 'react-helmet-async';
 
 import "../styles/Page.css";
 import "../styles/FlipCard.css";
@@ -96,227 +96,58 @@ function Races() {
         return savedYear ? JSON.parse(savedYear) : "2025";
     });
 
-    const [allSessions, setAllSessions] = useState({});
-    const [allRaceFastestLapsData, setAllRaceFastestLapsData] = useState({}); // Nova chave para fastest laps
-
+    const [currentYearSessions, setCurrentYearSessions] = useState([]);
     const [isLoadingCurrentYearData, setIsLoadingCurrentYearData] = useState(true);
-    const [isPreloadingAllYears, setIsPreloadingAllYears] = useState(true);
-
     const [currentYearError, setCurrentYearError] = useState(null);
-
     const [flippedCardKey, setFlippedCardKey] = useState(null);
 
-    const isPreloadingRef = useRef(false);
-
-    // --- Helper para buscar sessões para um ano específico ---
-    const fetchAndCacheSessionsForYear = useCallback(async (targetYear) => {
-        try {
-            const cachedSessions = getCachedDataWithTTL(`f1RaceSessions_${targetYear}`); // Nova chave
-            if (cachedSessions && cachedSessions.length > 0) {
-                setAllSessions(prev => ({ ...prev, [targetYear]: cachedSessions }));
-                console.log(`[Cache] Sessions for ${targetYear} loaded from cache.`);
-                return cachedSessions;
-            } else {
-                console.log(`[Fetch] Fetching sessions for ${targetYear} from API...`);
-                const fetchedSessions = await fetchWithRetry(
-                    `https://api.openf1.org/v1/sessions?year=${targetYear}`
-                );
-                if (!fetchedSessions || fetchedSessions.length === 0) {
-                    throw new Error(`No sessions found for year ${targetYear}.`);
-                }
-
-                const relevantSessions = fetchedSessions.filter(
-                    (session) => session.session_type === "Race" // Alterado para "Race"
-                );
-                setAllSessions(prev => ({ ...prev, [targetYear]: relevantSessions }));
-                setCachedDataWithTTL(`f1RaceSessions_${targetYear}`, relevantSessions); // Nova chave
-                return relevantSessions;
-            }
-        } catch (err) {
-            console.error(`[Error] Error loading sessions for ${targetYear}:`, err);
-            if (targetYear === year) {
-                setCurrentYearError(`Não foi possível carregar as sessões de corrida para ${targetYear}. Por favor, tente novamente.`);
-            }
-            return [];
-        }
-    }, [year]);
-
-    // --- Helper para buscar dados de melhor volta para uma sessão (adaptado para Race) ---
-    const fetchBestLapData = useCallback(async (session) => {
-        try {
-            // Para corridas, buscamos a volta mais rápida registrada na corrida
-            const laps = await fetchWithRetry(
-                `https://api.openf1.org/v1/laps?session_key=${session.session_key}&is_fastest_lap=true` // Busca a volta mais rápida da corrida
-            );
-            if (!laps || laps.length === 0) return null;
-
-            const fastestLap = laps[0]; // Como buscamos is_fastest_lap=true, deve vir apenas um
-
-            if (!fastestLap) return null;
-
-            const driverData = await fetchWithRetry(
-                `https://api.openf1.org/v1/drivers?driver_number=${fastestLap.driver_number}&session_key=${session.session_key}`
-            );
-            const driverName = driverData && driverData.length > 0 ? driverData[0].broadcast_name : "Desconhecido";
-            const teamColour = driverData && driverData.length > 0 ? driverData[0].team_colour : "666666";
-
-            return {
-                session_key: session.session_key,
-                driverName: driverName,
-                lapTime: fastestLap.lap_duration,
-                teamColour: teamColour,
-            };
-        } catch (innerError) {
-            console.error(
-                `[Fetch Error] Error processing fastest lap for race session ${session.session_key}:`,
-                innerError
-            );
-            return null;
-        }
-    }, []);
-
-    // --- Helper para buscar e cachear resultados de voltas rápidas para um ano ---
-    const fetchAndCacheFastestLapsForYear = useCallback(async (targetYear, sessionsForYear) => {
-        if (!sessionsForYear || sessionsForYear.length === 0) {
-            console.log(`No race sessions to fetch fastest laps for year ${targetYear}.`);
-            return;
-        }
-
-        console.log(`[Processing] Fetching fastest laps for year ${targetYear}...`);
-
-        let currentFastestLaps = getCachedDataWithTTL(`f1RaceFastestLaps_${targetYear}`) || {}; // Nova chave
-        let updatedAny = false;
-
-        for (const session of sessionsForYear) {
-            if (!currentFastestLaps[session.session_key]) {
-                try {
-                    const data = await fetchBestLapData(session);
-                    if (data) {
-                        currentFastestLaps[data.session_key] = data;
-                        setAllRaceFastestLapsData(prev => ({ // Nova chave
-                            ...prev,
-                            [targetYear]: {
-                                ...(prev[targetYear] || {}),
-                                [data.session_key]: data
-                            }
-                        }));
-                        updatedAny = true;
-                    }
-                    await delay(1500);
-                } catch (err) {
-                    console.error(`[Error] Failed to fetch fastest lap for race session ${session.session_key} in year ${targetYear}:`, err);
-                }
-            } else {
-                setAllRaceFastestLapsData(prev => ({ // Nova chave
-                    ...prev,
-                    [targetYear]: {
-                        ...(prev[targetYear] || {}),
-                        [session.session_key]: currentFastestLaps[session.session_key]
-                    }
-                }));
-            }
-        }
-
-        if (updatedAny || Object.keys(currentFastestLaps).length > 0) {
-            setCachedDataWithTTL(`f1RaceFastestLaps_${targetYear}`, currentFastestLaps); // Nova chave
-            console.log(`[Cache] Fastest laps for ${targetYear} saved to cache.`);
-        }
-    }, [fetchBestLapData]);
-
-    // --- Efeito para pré-carregar os dados de sessões e resultados para 2025, 2024, 2023 ---
     useEffect(() => {
-        if (isPreloadingRef.current) {
-            return;
-        }
-
-        isPreloadingRef.current = true;
-        setIsPreloadingAllYears(true);
-
-        const preloadAllYearsData = async () => {
-            const yearsToLoad = ["2025", "2024", "2023"];
-            let sessionsAcrossYears = {};
-
-            setCurrentYearError(null);
+        let isMounted = true;
+        const fetchSessionsForYear = async () => {
             setIsLoadingCurrentYearData(true);
-
-            console.log("[Preload] Starting Phase 1: Fetching all race sessions...");
-            for (const targetYear of yearsToLoad) {
-                const sessions = await fetchAndCacheSessionsForYear(targetYear);
-                if (sessions && sessions.length > 0) {
-                    sessionsAcrossYears[targetYear] = sessions;
-                } else {
-                    console.log(`[Preload] No race sessions found for ${targetYear} in Phase 1.`);
-                    if (targetYear === year) {
-                        setCurrentYearError(`Nenhuma Corrida encontrada para ${year}.`);
-                        setIsLoadingCurrentYearData(false);
+            setCurrentYearError(null);
+            try {
+                const cacheKey = `f1RaceSessions_${year}`;
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Date.now() - parsed.timestamp < 2 * 60 * 60 * 1000) {
+                        if (isMounted) {
+                            setCurrentYearSessions(parsed.data);
+                            setIsLoadingCurrentYearData(false);
+                        }
+                        return;
                     }
                 }
-                if (targetYear !== yearsToLoad[yearsToLoad.length - 1]) {
-                    await delay(500);
+
+                const res = await fetch(`https://api.openf1.org/v1/sessions?year=${year}`);
+                if (res.status === 429) throw new Error("A API da F1 está sobrecarregada (Limite de requisições excedido). Tente novamente em alguns minutos.");
+                if (!res.ok) throw new Error("Erro de conexão com a API da Fórmula 1.");
+                
+                const data = await res.json();
+                const relevantSessions = data.filter(
+                    (session) => session.session_type === "Race" || session.session_name.includes("Race")
+                );
+
+                if (relevantSessions.length === 0) {
+                    throw new Error(`Nenhuma Corrida encontrada para ${year}.`);
                 }
-            }
-            console.log("[Preload] Phase 1: All race sessions fetched and cached.");
 
-            console.log("[Preload] Starting Phase 2: Fetching fastest laps for races...");
-            for (const targetYear of yearsToLoad) {
-                const sessionsForYear = sessionsAcrossYears[targetYear];
-                if (sessionsForYear && sessionsForYear.length > 0) {
-                    await fetchAndCacheFastestLapsForYear(targetYear, sessionsForYear);
+                localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: relevantSessions }));
+
+                if (isMounted) {
+                    setCurrentYearSessions(relevantSessions);
                 }
+            } catch (err) {
+                if (isMounted) setCurrentYearError(err.message);
+            } finally {
+                if (isMounted) setIsLoadingCurrentYearData(false);
             }
-            console.log("[Preload] Phase 2: All fastest race laps fetched and cached.");
-
-            const hasSessions = allSessions[year] && allSessions[year].length > 0;
-            const hasFastestLaps = allRaceFastestLapsData[year] && Object.keys(allRaceFastestLapsData[year]).length >= (allSessions[year] ? allSessions[year].length : 0);
-
-            if (hasSessions || year === "2025") {
-                 setIsLoadingCurrentYearData(false);
-            } else if (!hasSessions && !currentYearError) {
-                setCurrentYearError(`Nenhuma Corrida encontrada para ${year}.`);
-                setIsLoadingCurrentYearData(false);
-            }
-
-            setIsPreloadingAllYears(false);
-            isPreloadingRef.current = false;
-            console.log("[Preload] All years pre-loaded for Races.");
         };
 
-        preloadAllYearsData();
+        fetchSessionsForYear();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchAndCacheSessionsForYear, fetchAndCacheFastestLapsForYear, year, allSessions, allRaceFastestLapsData]);
-
-    // --- Efeito para gerenciar o loading do ANO ATUAL quando o 'year' muda ---
-    useEffect(() => {
-        const sessionsLoaded = allSessions[year] && allSessions[year].length > 0;
-        const fastestLapsLoaded = allRaceFastestLapsData[year] && Object.keys(allRaceFastestLapsData[year]).length >= (sessionsLoaded ? allSessions[year].length : 0);
-
-        if (!sessionsLoaded || (sessionsLoaded && !fastestLapsLoaded && year !== "2025")) {
-             setIsLoadingCurrentYearData(true);
-             setCurrentYearError(null);
-        } else {
-             setIsLoadingCurrentYearData(false);
-        }
-
-        if (year === "2025" && sessionsLoaded) {
-            setIsLoadingCurrentYearData(false);
-            setCurrentYearError(null);
-        } else if (year === "2025" && !sessionsLoaded) {
-            setIsLoadingCurrentYearData(true);
-            setCurrentYearError(null);
-        }
-
-    }, [year, allSessions, allRaceFastestLapsData]);
-
-    // --- Efeito para atualizar o título da página ---
-    useEffect(() => {
-        document.title = `Corridas - Calendário ${year} | Fórmula 1 - Statistics`;
-        const metaDescription = document.querySelector('meta[name="description"]') || document.createElement("meta");
-        if (!metaDescription.parentNode) {
-            metaDescription.name = "description";
-            document.head.appendChild(metaDescription);
-        }
-        metaDescription.content = `Confira os resultados das Corridas da Fórmula 1 para o ano de ${year}. Veja datas, horários, circuitos e locais.`;
+        return () => { isMounted = false; };
     }, [year]);
 
     // --- Efeito para salvar o ano selecionado no localStorage ---
@@ -324,18 +155,17 @@ function Races() {
         localStorage.setItem("f1SelectedRaceYear", JSON.stringify(year)); // Nova chave
     }, [year]);
 
-    // --- Lógica de exibição baseada no ano selecionado ---
-    const currentYearSessions = allSessions[year] || [];
-    const currentYearFastestLaps = allRaceFastestLapsData[year] || {}; // Nova chave
-
-    const raceSessionsDisplay = currentYearSessions.filter(
-        (session) => session.session_type === "Race"
-    );
-
+    const raceSessionsDisplay = currentYearSessions;
     const showOverallLoading = isLoadingCurrentYearData;
 
     return (
         <>
+            <Helmet>
+                <title>Corridas {year} | Fórmula 1 Statistics</title>
+                <meta name="description" content={`Resultados das corridas de Fórmula 1 em ${year}. Datas, circuitos, países e tempos mais rápidos.`} />
+                <meta property="og:title" content={`Corridas ${year} | Fórmula 1 Statistics`} />
+                <meta property="og:url" content="https://formula1-statistics.vercel.app/races" />
+            </Helmet>
             <Header />
             <section>
                 {!currentUser ? ( // <--- Início da lógica de autenticação
@@ -362,6 +192,7 @@ function Races() {
                                 onChange={(e) => setYear(e.target.value)}
                                 title="Selecione o ano para ver as Corridas de F1"
                             >
+                                <option value="2026">2026</option>
                                 <option value="2025">2025</option>
                                 <option value="2024">2024</option>
                                 <option value="2023">2023</option>

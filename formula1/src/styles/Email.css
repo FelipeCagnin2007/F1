@@ -1,36 +1,83 @@
+/* ============================================================
+   EMAIL.CSS — Formulário de contato
+   ============================================================ */
+
 .email-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .email-form input {
+    gap: var(--space-4);
     width: 100%;
-    max-width: 400px;
-    padding: 1rem 1rem;
-    border: 2px solid aliceblue;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-  }
-  
-  .email-form input:focus {
-    border-color: #e10600; /* F1 Red */
+    max-width: 420px;
+}
+
+.email-form input {
+    width: 100%;
+    height: 44px;
+    padding: 0 var(--space-4);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
+    font-family: var(--font-family);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.email-form input::placeholder {
+    color: var(--color-text-disabled);
+}
+
+.email-form input:hover {
+    border-color: var(--color-border-hover);
+}
+
+.email-form input:focus {
     outline: none;
-  }
-  
-  .email-form button {
-    padding: 0.75rem 2rem;
-    background-color: #e10600; /* F1 Red */
-    color: aliceblue;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.12);
+}
+
+.email-form button {
+    height: 44px;
+    padding: 0 var(--space-8);
+    background-color: var(--color-accent);
+    color: #FFFFFF;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-family);
     cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .email-form button:hover {
-    background-color: #b00000;
-  }
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-bounce),
+        box-shadow var(--transition-fast);
+}
+
+.email-form button:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-accent);
+}
+
+.email-form button:active {
+    transform: scale(0.98);
+}
+
+.email-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--color-success-light);
+    border: 1px solid rgba(45, 157, 94, 0.2);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.email-success h3 {
+    color: var(--color-success);
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-semibold);
+}

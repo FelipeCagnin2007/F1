@@ -3,6 +3,7 @@ import { db } from "../firebase/firebaseConfig";
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import { Helmet } from 'react-helmet-async';
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -16,24 +17,7 @@ import "../styles/Chat.css";
 const ADMIN_EMAIL = 'radiance.knight.2007@gmail.com';
 
 function Chat() {
-    // --- SEO: Gerenciamento do Título da Página e Meta Descrição ---
-    useEffect(() => {
-        document.title = "Chat Global F1 | Fórmula 1 - Statistics";
-
-        let metaDescription = document.querySelector('meta[name="description"]');
-        if (!metaDescription) {
-            metaDescription = document.createElement('meta');
-            metaDescription.name = 'description';
-            document.head.appendChild(metaDescription);
-        }
-        metaDescription.content = "Participe do chat global da Fórmula 1! Conecte-se com outros fãs, discuta corridas, pilotos e o universo da F1 em tempo real.";
-
-        return () => {
-            if (metaDescription && metaDescription.parentNode) {
-                metaDescription.parentNode.removeChild(metaDescription);
-            }
-        };
-    }, []); // Este useEffect não depende de estados, então roda uma vez ao montar
+    // SEO via Helmet abaixo no JSX
 
     const [messageText, setMessageText] = useState('');
     const [messages, setMessages] = useState([]);
@@ -251,6 +235,12 @@ function Chat() {
 
     return (
         <>
+            <Helmet>
+                <title>Chat Global F1 | Fórmula 1 Statistics</title>
+                <meta name="description" content="Participe do chat global da Fórmula 1! Conecte-se com outros fãs, discuta corridas, pilotos e o universo da F1 em tempo real." />
+                <meta property="og:title" content="Chat Global F1 | Fórmula 1 Statistics" />
+                <meta property="og:url" content="https://formula1-statistics.vercel.app/chat" />
+            </Helmet>
             <Header />
 
             <section className="Main">

@@ -1,152 +1,306 @@
+/* ============================================================
+   AUTH.CSS — Formulários de autenticação modernos
+   ============================================================ */
+
+/* ---- Wrapper da página de auth ---- */
 .auth-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  max-width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--color-bg);
+    padding: var(--space-6);
+    background-image:
+        radial-gradient(circle at 20% 80%, rgba(225, 6, 0, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(13, 110, 253, 0.04) 0%, transparent 50%);
 }
 
-.LoginButton,
-.RegisterButton {
-  padding: 1em;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  width: 7.5em;
-}
-.RegisterButton {
-  background-color: #28a745;
-}
+/* ---- Card do formulário ---- */
 .totalContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: #007bff solid 1px;
-  border-radius: 10px;
-  padding: 2em;
-  margin: 1em;
-  background-color: aliceblue;
-          max-width: 100vw;
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10) var(--space-8);
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-1);
+    animation: fadeInUp 0.4s ease forwards;
+}
 
-  form {
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Título do formulário ---- */
+.totalContainer h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
+}
+
+/* ---- Linha decorativa ---- */
+.totalContainer h2::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+    margin: var(--space-2) auto 0;
+}
+
+/* ---- Form ---- */
+.totalContainer form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.totalContainer form label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    display: block;
+    margin-bottom: var(--space-1);
+}
+
+.totalContainer form input {
+    width: 100%;
+    height: 44px;
+    padding: 0 var(--space-4);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.totalContainer form input:hover {
+    border-color: var(--color-border-hover);
+}
+
+.totalContainer form input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.12);
+}
+
+.totalContainer form input::placeholder {
+    color: var(--color-text-disabled);
+}
+
+/* ---- Botão submit ---- */
+.totalContainer form button[type="submit"] {
+    width: 100%;
+    height: 44px;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    margin-top: var(--space-2);
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-bounce),
+        box-shadow var(--transition-fast);
+}
+
+.totalContainer form button[type="submit"]:hover {
+    transform: translateY(-2px);
+}
+
+.totalContainer form button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+.totalContainer form button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---- Mensagem de erro ---- */
+.totalContainer form p {
+    font-size: var(--text-sm);
+    color: var(--color-error);
+    background: var(--color-error-light);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    text-align: left;
+    width: 100%;
+    margin: 0;
+}
+
+/* ---- Links dentro do form ---- */
+.totalContainer form a {
+    color: var(--color-info);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast);
+}
+
+.totalContainer form a:hover {
+    color: #0b5ed7;
+    text-decoration: underline;
+}
+
+/* ---- Variantes por tipo ---- */
+.totalContainer.signin form button[type="submit"] {
+    background-color: var(--color-info);
+}
+
+.totalContainer.signin form button[type="submit"]:hover {
+    background-color: #0b5ed7;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.totalContainer.signup form button[type="submit"] {
+    background-color: var(--color-success);
+}
+
+.totalContainer.signup form button[type="submit"]:hover {
+    background-color: #25854f;
+    box-shadow: 0 4px 12px rgba(45, 157, 94, 0.3);
+}
+
+.totalContainer.Forgot form button[type="submit"] {
+    background-color: var(--color-accent);
+}
+
+.totalContainer.Forgot form button[type="submit"]:hover {
+    background-color: var(--color-accent-hover);
+    box-shadow: var(--shadow-accent);
+}
+
+/* ---- "Já tem uma conta?" ---- */
+.accountAlready {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-
-    a{
-      text-decoration: none;
-      color: aliceblue;
-    }
-
-    input {
-      margin: 0.5em;
-      padding: 0.5em;
-      border: 1px solid #007bff;
-      border-radius: 5px;
-      width: 200px;
-    }
-
-    button {
-      padding: 0.5em 1em;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 1em;
-
-    }
-    
-    p {
-      margin-top: 1em;
-      color: red;
-      font-size: 14px;
-      width: 100%;
-    }
-  }
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    margin-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
 }
 
-.totalContainer.signin {
-  color: #007bff;
-  button {
-    background-color: #007bff;
-  }
-}
-.totalContainer.signup {
-  color: #28a745;
-  button {
-    background-color: #28a745;
-  }
-}
-.totalContainer.Forgot {
-  color: #ff1e00ff;
-  button {
-    background-color: #ff1e00ff;
-  }
-  .backLoginPage{
-    background-color: #007bff;
-  }
-}
-.accountAlready {
-  margin-top: 2.5em;
-  border-top: #21212c solid 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  color: #28a745;
-
-  .ButtonAccountConfig {
-    padding: 0.5em 1em;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    background-color: #28a745 !important;
-  }
-  .ButtonAccountConfig.Register {
-    background-color: #007bff !important;
-  }
-
-  a {
-    text-decoration: none;
-    color: aliceblue;
-  }
+.accountAlready h2 {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-muted);
+    margin: 0;
 }
 
-.accountAlready.Register {
-  color: #007bff;
+.accountAlready h2::after {
+    display: none;
 }
 
-@media screen and (max-width: 1024px) {
-  .auth-container {
-    flex-direction: column;
-    padding: 1em;
-    gap: 0.5em;
-    max-width: 100vw;
-    h1 {
-      color: #21212c;
-    }
-  }
-  .LoginButton,
-  .RegisterButton {
+.accountAlready .ButtonAccountConfig {
     width: 100%;
-    margin: 0.5em 0;
-  }
+    height: 40px;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-bounce);
+    background-color: var(--color-success);
+}
 
-  .totalContainer {
-    background-color: #21212c;
-    width: auto;
-    height: auto;
-  }
-  .accountAlready {
-    border-top: aliceblue solid 1px;
-  }
+.accountAlready .ButtonAccountConfig:hover {
+    background-color: #25854f;
+    transform: translateY(-1px);
+}
+
+.accountAlready .ButtonAccountConfig.Register {
+    background-color: var(--color-info);
+}
+
+.accountAlready .ButtonAccountConfig.Register:hover {
+    background-color: #0b5ed7;
+}
+
+.accountAlready a:not(.ButtonAccountConfig > a) {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-size: var(--text-sm);
+}
+
+.accountAlready .ButtonAccountConfig a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Voltar para home link */
+.back-home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-success) !important;
+    text-decoration: none !important;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    transition: color var(--transition-fast);
+    margin-top: var(--space-2);
+}
+
+.back-home-link:hover {
+    color: #25854f !important;
+}
+
+.backLoginPage {
+    background-color: var(--color-info) !important;
+}
+
+/* ---- Botões fora do form (LoginButton e RegisterButton) ---- */
+.LoginButton.auth-btn,
+.RegisterButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-bounce);
+}
+
+.RegisterButton {
+    background-color: var(--color-success);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+    .auth-page {
+        padding: var(--space-4);
+        align-items: flex-start;
+        padding-top: var(--space-8);
+    }
+
+    .totalContainer {
+        padding: var(--space-8) var(--space-5);
+        border-radius: var(--radius-lg);
+    }
 }

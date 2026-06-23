@@ -1,33 +1,19 @@
 // src/pages/Forgot.jsx
-import { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import ResetPassword from '../components/auth/ResetPassword.jsx';
 import "../styles/Auth.css";
 import "../styles/Page.css";
 
 function Forgot() {
-  useEffect(() => {
-    // --- SEO: Gerenciamento do Título da Página ---
-    document.title = "Redefinir Senha | Fórmula 1 - Statistics"; // Título já estava em PT-BR, adicionei um complemento
-
-    // --- SEO: Gerenciamento da Meta Descrição ---
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.name = 'description';
-      document.head.appendChild(metaDescription);
-    }
-    metaDescription.content = "Página para redefinir sua senha de acesso ao F1 Dashboard. Insira seu e-mail para receber as instruções de recuperação.";
-
-    return () => {
-      // Limpeza: Remove a meta tag ao desmontar o componente
-      if (metaDescription && metaDescription.parentNode) {
-        metaDescription.parentNode.removeChild(metaDescription);
-      }
-    };
-  }, []); // Sem dependências, pois o conteúdo é estático para esta página
-
   return (
     <>
+      <Helmet>
+        <title>Redefinir Senha | Fórmula 1 Statistics</title>
+        <meta name="description" content="Redefina sua senha de acesso ao Fórmula 1 Statistics. Insira seu e-mail para receber o link de recuperação." />
+        <meta property="og:title" content="Redefinir Senha | Fórmula 1 Statistics" />
+        <meta property="og:url" content="https://formula1-statistics.vercel.app/forgot" />
+        <meta name="robots" content="noindex, follow" />
+      </Helmet>
       <section className="auth-page">
         <ResetPassword />
       </section>

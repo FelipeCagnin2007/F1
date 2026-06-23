@@ -1,13 +1,15 @@
-/* eslint-disable no-unused-vars */
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import Loading from "../components/Loading.jsx";
 import SessionCard from "../components/SessionCard.jsx";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useAuth } from '../context/AuthContext.jsx';
+import { Link } from "react-router-dom";
+import { Helmet } from 'react-helmet-async';
 import "../styles/Page.css";
 import "../styles/FlipCard.css";
 
-// --- Funções Auxiliares de API e Cache (MANTENHA AS MESMAS) ---
+// --- Funções Auxiliares de API e Cache ---
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 async function fetchWithRetry(url, retries = 5, initialDelayMs = 1000) {
@@ -233,7 +235,7 @@ function Practices() {
         setIsPreloadingAllYears(true);
 
         const preloadAllYearsData = async () => {
-            const yearsToLoad = ["2025", "2024", "2023"];
+            const yearsToLoad = ["2026", "2025", "2024", "2023"];
             let sessionsAcrossYears = {};
 
             setCurrentYearError(null);
@@ -255,21 +257,13 @@ function Practices() {
                     await delay(500);
                 }
             }
-            console.log("[Preload] Phase 1: All practice sessions fetched and cached.");
+            console.log("[Preload] Phase 1: All practice sessions fetched. // Fase 2 removida para evitar Rate Limit na API.");
+            console.log("// Os cards agora carregam os dados apenas quando são clicados (Lazy Loading).");
 
-            console.log("[Preload] Starting Phase 2: Fetching fastest laps for practices...");
-            for (const targetYear of yearsToLoad) {
-                const sessionsForYear = sessionsAcrossYears[targetYear];
-                if (sessionsForYear && sessionsForYear.length > 0) {
-                    await fetchAndCacheFastestLapsForYear(targetYear, sessionsForYear);
-                }
-            }
-            console.log("[Preload] Phase 2: All fastest practice laps fetched and cached.");
-
+            // Verifica se as sessões do ano atual estão no estado
             const hasSessions = allSessions[year] && allSessions[year].length > 0;
-            const hasFastestLaps = allPracticeFastestLapsData[year] && Object.keys(allPracticeFastestLapsData[year]).length >= (allSessions[year] ? allSessions[year].length : 0);
 
-            if (hasSessions || year === "2025") {
+            if (hasSessions || year === "2025" || year === "2026") {
                  setIsLoadingCurrentYear(false);
             } else if (!hasSessions && !currentYearError) {
                 setCurrentYearError(`Nenhum Treino encontrado para ${year}.`);
@@ -284,40 +278,30 @@ function Practices() {
         preloadAllYearsData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchAndCacheSessionsForYear, fetchAndCacheFastestLapsForYear, year, allSessions, allPracticeFastestLapsData]);
+    }, [fetchAndCacheSessionsForYear, year, allSessions]);
 
     // --- Efeito para gerenciar o loading do ANO ATUAL quando o 'year' muda ---
     useEffect(() => {
         const sessionsLoaded = allSessions[year] && allSessions[year].length > 0;
-        const fastestLapsLoaded = allPracticeFastestLapsData[year] && Object.keys(allPracticeFastestLapsData[year]).length >= (sessionsLoaded ? allSessions[year].length : 0);
 
-        if (!sessionsLoaded || (sessionsLoaded && !fastestLapsLoaded && year !== "2025")) {
-             setIsLoadingCurrentYear(true); // Usando isLoadingCurrentYear aqui
+        if (!sessionsLoaded && year !== "2025" && year !== "2026") {
+             setIsLoadingCurrentYear(true);
              setCurrentYearError(null);
         } else {
-             setIsLoadingCurrentYear(false); // Usando isLoadingCurrentYear aqui
+             setIsLoadingCurrentYear(false);
         }
 
-        if (year === "2025" && sessionsLoaded) {
-            setIsLoadingCurrentYear(false); // Usando isLoadingCurrentYear aqui
+        if ((year === "2025" || year === "2026") && sessionsLoaded) {
+            setIsLoadingCurrentYear(false);
             setCurrentYearError(null);
-        } else if (year === "2025" && !sessionsLoaded) {
-            setIsLoadingCurrentYear(true); // Usando isLoadingCurrentYear aqui
+        } else if ((year === "2025" || year === "2026") && !sessionsLoaded) {
+            setIsLoadingCurrentYear(true);
             setCurrentYearError(null);
         }
 
-    }, [year, allSessions, allPracticeFastestLapsData]);
+    }, [year, allSessions]);
 
-    // --- Efeito para atualizar o título da página ---
-    useEffect(() => {
-        document.title = `Treinos Livres - Calendário ${year} | Fórmula 1 - Statistics`;
-        const metaDescription = document.querySelector('meta[name="description"]') || document.createElement("meta");
-        if (!metaDescription.parentNode) {
-            metaDescription.name = "description";
-            document.head.appendChild(metaDescription);
-        }
-        metaDescription.content = `Confira os resultados das sessões de Treinos Livres da Fórmula 1 para o ano de ${year}. Veja datas, horários, circuitos e locais.`;
-    }, [year]);
+    // useEffect de SEO substituído por Helmet no JSX
 
     // --- Efeito para salvar o ano selecionado no localStorage ---
     useEffect(() => {
@@ -340,20 +324,26 @@ function Practices() {
     );
 
     // O loading principal agora é ativado se o ano atual está carregando
-    // Você tinha 'showOverallLoading', mudei para 'isLoadingCurrentYear' para consistência
-    const showOverallLoading = isLoadingCurrentYear; // Renomeando para o que você já usava no return
+    const showOverallLoading = isLoadingCurrentYear;
 
     return (
         <>
+            <Helmet>
+                <title>Treinos Livres {year} | Fórmula 1 Statistics</title>
+                <meta name="description" content={`Confira os resultados das sessões de Treinos Livres da Fórmula 1 para ${year}. Datas, horários, circuitos e tempos mais rápidos.`} />
+                <meta property="og:title" content={`Treinos Livres ${year} | Fórmula 1 Statistics`} />
+                <meta property="og:url" content="https://formula1-statistics.vercel.app/pratices" />
+            </Helmet>
             <Header />
             <section>
                 <div className="container tags">
-                    <h1 className="title">Treinos Livres - F1 {year}</h1>
+                    <h1 className="page-title">Treinos Livres <span>F1 {year}</span></h1>
                     <select
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
-                        title="Selecione o ano para ver os treinos livres de F1"
+                        title="Selecione o ano para ver os Treinos Livres"
                     >
+                        <option value="2026">2026</option>
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
@@ -361,7 +351,7 @@ function Practices() {
                 </div>
 
                 {/* Display loading only when the current year's data is being loaded */}
-                {showOverallLoading && !currentYearError && ( // Usando showOverallLoading
+                {showOverallLoading && !currentYearError && (
                     <>
                         <br />
                         <Loading />

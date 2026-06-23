@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { HelmetProvider } from 'react-helmet-async';
 
 import Home from './pages/Home';
 import Drivers from './pages/Drivers';
@@ -19,12 +20,11 @@ import ForgotPassword from './pages/Forgot.jsx';
 
 import './App.css';
 
-// Importe o AuthProvider
-import { AuthProvider } from './context/AuthContext.jsx'; // Ajuste o caminho se necessário
+import { AuthProvider } from './context/AuthContext.jsx';
 
 function App() {
   return (
-    <>
+    <HelmetProvider>
       <Analytics />
       <SpeedInsights />
       <AuthProvider>
@@ -47,7 +47,7 @@ function App() {
           </Routes>
         </BrowserRouter>
       </AuthProvider>
-    </>
+    </HelmetProvider>
   );
 }
 

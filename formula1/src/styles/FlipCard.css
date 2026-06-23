@@ -1,148 +1,154 @@
-/* Container for the cards within an article section */
+/* ============================================================
+   FLIPCARD.CSS — Cards flip de sessões (Qualifying, Races, Sprints, Practices)
+   ============================================================ */
+
+/* ---- Container dos cards ---- */
 .qualifying-cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Center cards horizontally */
-  max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: var(--max-width);
+    padding: 0 var(--space-6) var(--space-8);
 }
 
-/* Base Card Styles for Qualifying */
+/* ---- Card base ---- */
 .qualifying-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 2em;
-  perspective: 1000px;
-  height: 15vh;
+    perspective: 1200px;
+    cursor: pointer;
+    width: 300px;
 }
 
-/* The inner container that performs the rotation */
+/* ---- Card inner (rotação) ---- */
 .qualifying-card-inner {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 25vw;
-  height: auto;
-  transform-style: preserve-3d;
-  transition: transform 1s;
-  position: relative;
+    width: 100%;
+    height: 160px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border-radius: var(--radius-lg);
 }
 
-/* State when the qualifying card is flipped */
 .qualifying-card-inner.is-flipped {
-  transform: rotateY(180deg);
+    transform: rotateY(180deg);
 }
 
-/* Front and Back Faces of the Qualifying Card */
+/* ---- Faces ---- */
 .qualifying-card-front,
 .qualifying-card-back {
-  position: absolute; /* Ensure both faces are absolutely positioned */
-  backface-visibility: hidden; /* Hides the back face when not flipped */
-  overflow: hidden; /* Important for the background text not to spill out */
-  width: 100%;
-  height: 17.5vh;
-  background-color: #21212c;
-  border-radius: 1em;
-  border: aliceblue 0.75em solid;
-  margin: 1em;
-  text-align: center;
-  box-shadow: #21212c 1.2em 1.2em 1.6em;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-5);
+    overflow: hidden;
 }
 
-/* Styles for paragraphs within the qualifying cards */
-.qualifying-card-front p,
-.qualifying-card-back p {
-  width: auto;
-  font-size: larger;
-  margin: 0%;
-  padding: 0.5em;
-}
-
-/* Specific styles for the Front of the Qualifying Card */
+/* ---- Frente ---- */
 .qualifying-card-front {
-  z-index: 2; /* Ensures the front is on top when not flipped */
-  background-image: url("..//assets/formula1-noback.png");
-  background-size: 12.5%;
-  background-position: right bottom;
-  background-repeat: no-repeat;
-  transition: opacity 1s; /* Add transition for smooth fade-out */
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+    z-index: 2;
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+    gap: var(--space-2);
+
+    /* Logo sutil no canto */
+    background-image: url("../assets/formula1-noback.png");
+    background-size: 60px;
+    background-position: right var(--space-3) bottom var(--space-3);
+    background-repeat: no-repeat;
+    opacity: 1;
 }
 
-/* Specific styles for the Back of the Qualifying Card */
-.qualifying-card-back {
-  transform: rotateY(180deg); /* Starts rotated so it appears when flipped */
+.qualifying-card:hover .qualifying-card-front:not(.is-flipped .qualifying-card-front) {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
 }
 
-/* Explicitly hide the front face when the card is flipped */
 .qualifying-card-inner.is-flipped .qualifying-card-front {
-  opacity: 0;
+    opacity: 0;
+    pointer-events: none;
 }
 
-
-@media screen and (max-width: 1624px) {
-  .qualifying-card-inner {
-    width: 27.5vw;
-  }
+/* Textos da frente */
+.qualifying-card-front p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    line-height: var(--leading-snug);
+    width: 100%;
 }
 
-@media screen and (max-width: 1279px) {
-  .qualifying-card-inner {
-    width: 40vw;
-  }
+.qualifying-card-front p strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
 }
 
-@media screen and (max-width: 1024px) {
-  .qualifying-card-inner {
-    width: 75vw;
-    box-shadow: none !important;
-  }
-
-  .qualifying-card-front,
-  .qualifying-card-back {
-    box-shadow: none !important;
-    border: #21212c 0.75em solid;
-    height: 20vh;
-  }
+/* ---- Verso ---- */
+.qualifying-card-back {
+    transform: rotateY(180deg);
+    box-shadow: var(--shadow-md);
+    gap: var(--space-3);
+    text-align: center;
 }
 
-@media screen and (max-width: 768px) {
-  .qualifying-card {
-    margin: 2em;
-  }
-
-  .qualifying-card-inner {
-    width: 85vw;
-    box-shadow: none !important;
-  }
-
-  .qualifying-card-front,
-  .qualifying-card-back {
-    box-shadow: none !important;
-    border: #21212c 0.75em solid;
-    height: 20vh;
-  }
+.qualifying-card-back p {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    line-height: var(--leading-snug);
 }
 
-@media screen and (max-width: 480px) {
-  .qualifying-card {
-    margin: 2em;
-  }
-  .qualifying-card-inner {
-    width: 85vw;
-    box-shadow: none !important;
-    height: 20vh;
-  }
+.qualifying-best-lap-background {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+}
 
-  .qualifying-card-front,
-  .qualifying-card-back {
-    box-shadow: none !important;
-    border: #21212c 0.75em solid;
-    height: 20vh;
-  }
+/* Label "Melhor Volta" */
+.qualifying-card-back p:first-of-type {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: var(--font-weight-semibold);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Valor principal: piloto e tempo */
+.qualifying-card-back p:last-of-type {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-bold);
+    color: #FFFFFF;
+}
+
+/* ---- Responsividade ---- */
+@media (max-width: 1280px) {
+    .qualifying-card { width: 280px; }
+}
+
+@media (max-width: 1024px) {
+    .qualifying-card { width: 85vw; max-width: 420px; }
+    .qualifying-card-inner { height: 140px; }
+    .qualifying-cards-container { padding: 0 var(--space-4) var(--space-6); }
+}
+
+@media (max-width: 768px) {
+    .qualifying-card { width: 90vw; max-width: 380px; }
+    .qualifying-card-inner { height: 150px; }
+}
+
+@media (max-width: 480px) {
+    .qualifying-card { width: calc(100vw - 2rem); }
+    .qualifying-card-inner { height: 140px; }
 }

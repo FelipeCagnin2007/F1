@@ -61,7 +61,7 @@ function SignUp() {
       await signup(email, password, name);
       // Se o código foi enviado com sucesso, avança para a etapa de verificação
       setCurrentStep('verifyCode');
-      alert('Um código de verificação foi enviado para seu e-mail! Por favor, verifique sua caixa de entrada.');
+      // Código enviado — o setCurrentStep abaixo fará a UI avançar
     } catch (err) {
       console.error('Erro na etapa inicial de registro:', err.message);
       // Tratamento de erros específicos que podem vir do 'signup' refatorado
@@ -95,7 +95,7 @@ function SignUp() {
       // ou redirecionar o usuário para a página de login para que ele faça o login manualmente.
       await login(email, password); // Tenta fazer login automático
 
-      alert('Cadastro realizado e login automático feito com sucesso!');
+      // Sucesso — navigate abaixo redireciona
       navigate('/'); // Redireciona para a página principal ou dashboard
     } catch (err) {
       console.error('Erro ao verificar código ou finalizar cadastro:', err.message);
@@ -135,7 +135,14 @@ function SignUp() {
             disabled={loading} // Desabilita enquanto verifica nome
           />
           {nameAvailabilityMessage && (
-            <p style={{ color: nameAvailabilityMessage.includes('disponível') ? 'green' : 'red' }}>
+            <p style={{
+              color: nameAvailabilityMessage.includes('disponível') ? 'var(--color-success)' : 'var(--color-error)',
+              background: nameAvailabilityMessage.includes('disponível') ? 'var(--color-success-light)' : 'var(--color-error-light)',
+              border: nameAvailabilityMessage.includes('disponível') ? '1px solid rgba(45,157,94,0.2)' : '1px solid rgba(220,53,69,0.2)',
+              padding: 'var(--space-2) var(--space-3)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--text-sm)'
+            }}>
               {nameAvailabilityMessage}
             </p>
           )}
@@ -159,7 +166,7 @@ function SignUp() {
             required
             disabled={loading}
           />
-          {error && <p style={{ color: 'red', marginBottom: '15px' }}>{error}</p>}
+          {error && <p role="alert">{error}</p>}
           <button
             type="submit"
             // Desabilita se estiver carregando ou se o nome de usuário não estiver disponível
@@ -183,7 +190,7 @@ function SignUp() {
             required
             disabled={loading}
           />
-          {error && <p style={{ color: 'red', marginBottom: '15px' }}>{error}</p>}
+          {error && <p role="alert">{error}</p>}
           <button
             type="submit"
             disabled={loading || verificationCodeInput.length !== 6} // Habilita apenas com 6 dígitos
@@ -198,7 +205,7 @@ function SignUp() {
               setLoading(true);
               try {
                 await signup(email, password, name); // Reenvia o código com os dados já preenchidos
-                alert('Novo código enviado! Verifique seu e-mail.');
+                setError('Novo código enviado! Verifique seu e-mail.');
               } catch (err) {
                 setError(err.message);
               } finally {
@@ -206,7 +213,7 @@ function SignUp() {
               }
             }}
             disabled={loading}
-            style={{ marginLeft: '10px' }}
+            style={{ marginLeft: 'var(--space-2)', background: 'var(--color-info)', color: '#fff', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}
           >
             Reenviar Código
           </button>
@@ -222,7 +229,7 @@ function SignUp() {
               localStorage.removeItem('verificationCodeExpiry');
             }}
             disabled={loading}
-            style={{ marginLeft: '10px' }}
+            style={{ marginLeft: 'var(--space-2)', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-secondary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', border: '1px solid var(--color-border)', cursor: 'pointer', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}
           >
             Voltar e Editar Dados
           </button>
@@ -235,20 +242,9 @@ function SignUp() {
           <Link to="/login">Login</Link>
         </button>
       </div>
-      <div style={{ marginTop: '15px' }}>
-        <Link
-          to="/"
-          style={{
-            color: '#007bff',
-            textDecoration: 'underline',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '0',
-            fontSize: '0.9em'
-          }}
-        >
-          Voltar para Home!
+      <div style={{ textAlign: 'center', marginTop: 'var(--space-3)' }}>
+        <Link to="/" className="back-home-link">
+          ← Voltar para Início
         </Link>
       </div>
     </div>

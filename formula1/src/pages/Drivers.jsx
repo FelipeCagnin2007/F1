@@ -4,6 +4,7 @@ import Loading from "../components/Loading.jsx";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from '../context/AuthContext.jsx';
+import { Helmet } from 'react-helmet-async';
 import "../styles/Page.css";
 import "../styles/Drivers.css"
 
@@ -42,41 +43,7 @@ function Drivers() {
   // === FIM DAS DECLARAÇÕES DE ESTADO ===
 
 
-  // --- SEO: Gerenciamento do Título da Página e Meta Descrição ---
-  useEffect(() => {
-    // Only proceed if races is an array and not empty
-    if (!Array.isArray(races) || races.length === 0) {
-      document.title = `Pilotos F1 | Fórmula 1 - Statistics`;
-      let metaDescription = document.querySelector('meta[name="description"]');
-      if (!metaDescription) {
-        metaDescription = document.createElement('meta');
-        metaDescription.name = 'description';
-        document.head.appendChild(metaDescription);
-      }
-      metaDescription.content = `Descubra todos os pilotos da Fórmula 1, incluindo informações de equipe, nacionalidade e estatísticas. Acompanhe seus pilotos favoritos.`;
-      return; // Exit early if no race data
-    }
-
-    const selectedRace = races.find(race => race.session_key === sessionKey);
-    const year = selectedRace ? selectedRace.year : 'Atual';
-    const circuitName = selectedRace ? selectedRace.circuit_short_name : '';
-
-    document.title = `Pilotos F1 - ${circuitName} ${year} | Fórmula 1 - Statistics`;
-
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.name = 'description';
-      document.head.appendChild(metaDescription);
-    }
-    metaDescription.content = `Descubra todos os pilotos da Fórmula 1 para a temporada de ${year}, incluindo informações de equipe, nacionalidade e estatísticas. Acompanhe seus pilotos favoritos.`;
-
-    return () => {
-      if (metaDescription && metaDescription.parentNode) {
-        metaDescription.parentNode.removeChild(metaDescription);
-      }
-    };
-  }, [sessionKey, races]);
+  // Helmet gerencia o SEO dinâmico no JSX
 
 
   useEffect(() => {
@@ -178,6 +145,12 @@ function Drivers() {
 
   return (
     <>
+      <Helmet>
+        <title>Pilotos da F1 | Fórmula 1 Statistics</title>
+        <meta name="description" content="Descubra todos os pilotos da Fórmula 1, incluindo informações de equipe, nacionalidade e estatísticas detalhadas. Acompanhe seus pilotos favoritos!" />
+        <meta property="og:title" content="Pilotos da F1 | Fórmula 1 Statistics" />
+        <meta property="og:url" content="https://formula1-statistics.vercel.app/drivers" />
+      </Helmet>
       <Header />
       <section>
         {!currentUser ? (
