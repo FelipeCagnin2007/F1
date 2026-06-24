@@ -1,127 +1,105 @@
-/* ============================================================
-   CHAT.CSS — Interface de chat em tempo real
-   ============================================================ */
-
-/* ---- Wrapper do chat ---- */
+/* src/styles/Chat.css */
 .chat-container-wrapper {
-    width: 100%;
-    max-width: 720px;
-    margin: var(--space-6) auto;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 10px;
     box-shadow: var(--shadow-lg);
+    background-color: var(--color-surface);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - var(--header-height) - var(--space-12));
-    min-height: 520px;
-    max-height: 800px;
-    overflow: hidden;
+    height: 80vh;
+    min-height: 500px;
 }
 
-/* ---- Header do chat ---- */
 .chat-container-wrapper h2 {
-    padding: var(--space-5) var(--space-6);
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-bold);
+    text-align: center;
     color: var(--color-text-primary);
-    border-bottom: 1px solid var(--color-border);
-    margin: 0;
-    background: var(--color-bg-secondary);
-    letter-spacing: -0.01em;
+    margin-bottom: 20px;
 }
 
-/* ---- Área de mensagens ---- */
 .messages-display-area {
-    flex: 1;
+    flex-grow: 1;
+    background-color: var(--color-bg-tertiary);
+    border-radius: 8px;
     overflow-y: auto;
-    padding: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
-    background-color: var(--color-bg-tertiary);
-    scroll-behavior: smooth;
+    width: 100%;
+    max-height: 50vh;
+    padding: 10px;
 }
 
-/* ---- Sem mensagens ---- */
 .no-messages-text {
     text-align: center;
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
+    color: var(--color-accent);
     margin: auto;
-    padding: var(--space-8);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
 }
 
-.no-messages-text::before {
-    content: '💬';
-    font-size: 2rem;
-}
-
-/* ---- Bolhas de mensagem ---- */
 .message-bubble {
-    max-width: 72%;
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-lg);
-    word-break: break-word;
-    animation: fadeInUp 0.2s ease forwards;
-    position: relative;
+    padding: 12px 18px;
+    border-radius: 20px;
+    max-width: 70%;
+    word-wrap: break-word;
+    box-shadow: var(--shadow-xs);
+    margin-top: 0.5em;
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
+.message-bubble p {
+    max-width: 100%;
 }
 
-/* Mensagem própria (direita) */
 .my-message {
     background-color: var(--color-accent);
-    color: #FFFFFF;
-    align-self: flex-end;
-    border-bottom-right-radius: var(--radius-xs);
-    box-shadow: 0 2px 8px rgba(225, 6, 0, 0.2);
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
 }
 
-/* Mensagem de outros (esquerda) */
 .other-message {
     background-color: var(--color-surface);
     color: var(--color-text-primary);
     align-self: flex-start;
     border: 1px solid var(--color-border);
-    border-bottom-left-radius: var(--radius-xs);
-    box-shadow: var(--shadow-xs);
+    border-bottom-left-radius: 5px;
 }
 
-/* ---- Mensagem de Admin ---- */
+/* -------------------------------------- */
+/* NOVO: Estilos para Mensagens do Administrador */
+/* -------------------------------------- */
 .message-bubble.admin-message {
-    background: linear-gradient(135deg, #6C5CE7, #a29bfe);
-    color: #FFFFFF;
+    background-color: var(--color-accent-hover);
+    color: white;
+    font-weight: bold;
     align-self: center;
-    max-width: 85%;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+    margin: 5px auto;
+    max-width: 80%;
+    border-radius: 10px;
+    padding: 10px 15px;
     border: none;
 }
 
+.message-bubble.admin-message .message-timestamp {
+    color: rgba(255, 255, 255, 0.9);
+}
+
 .message-bubble.my-message.admin-message {
-    background: linear-gradient(135deg, #5a4ed1, #9088f0);
+    background-color: #584fa7;
     align-self: flex-end;
 }
 
 .message-bubble.other-message.admin-message {
+    background-color: var(--color-accent-hover);
     align-self: flex-start;
 }
 
-/* ---- Nome do remetente ---- */
+/* -------------------------------------- */
+
 .message-sender-name {
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--space-1);
-    color: rgba(255, 255, 255, 0.75);
-    display: block;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .other-message .message-sender-name {
@@ -129,137 +107,87 @@
 }
 
 .admin-message .message-sender-name {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
 }
 
-/* ---- Texto da mensagem ---- */
+
 .message-text {
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
+    font-size: 1em;
+    line-height: 1.4;
     margin: 0;
 }
 
-/* ---- Timestamp ---- */
 .message-timestamp {
-    font-size: 10px;
-    color: rgba(0, 0, 0, 0.35);
-    display: block;
+    font-size: 0.7em;
+    color: var(--color-text-muted);
     text-align: right;
-    margin-top: var(--space-1);
+    display: block;
+    margin-top: 5px;
 }
 
 .my-message .message-timestamp {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.7);
 }
 
-.admin-message .message-timestamp {
-    color: rgba(255, 255, 255, 0.55);
-}
 
-/* ---- Área de input ---- */
 .message-input-area {
     display: flex;
-    align-items: flex-end;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-5);
-    background: var(--color-bg-secondary);
-    border-top: 1px solid var(--color-border);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 1em;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 1em;
 }
 
-/* ---- Input de texto ---- */
 .message-input {
-    flex: 1;
-    padding: var(--space-3) var(--space-4);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    font-size: var(--text-sm);
-    font-family: var(--font-family);
-    color: var(--color-text-primary);
+    flex-grow: 1;
+    border: 1px solid var(--color-border);
+    border-radius: 25px;
+    padding: 12px 18px;
+    font-size: 1em;
+    resize: vertical;
+    min-height: 3.5em;
+    max-height: 10em;
+    max-width: 75%;
+    box-sizing: border-box;
     background-color: var(--color-bg-secondary);
-    resize: none;
-    min-height: 44px;
-    max-height: 120px;
-    line-height: var(--leading-relaxed);
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.message-input::placeholder {
-    color: var(--color-text-disabled);
+    color: var(--color-text-primary);
 }
 
 .message-input:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.1);
+    box-shadow: 0 0 0 2px rgba(225, 6, 0, 0.25);
 }
 
-/* ---- Botão de enviar ---- */
-.message-input-area .LoginButton,
-.LoginButton.Register.Chat {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-3) var(--space-5);
-    background-color: var(--color-accent);
-    color: #FFFFFF;
-    font-size: var(--text-sm);
-    font-weight: var(--font-weight-semibold);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    min-width: 80px;
-    height: 44px;
-    flex-shrink: 0;
-    transition:
-        background-color var(--transition-fast),
-        transform var(--transition-bounce);
+.message-input-area .LoginButton {
+    padding: 10px 20px;
+    min-width: 90px;
+    border-radius: 8px;
 }
 
-.message-input-area .LoginButton:hover,
-.LoginButton.Register.Chat:hover {
-    background-color: var(--color-accent-hover);
-    transform: translateY(-1px);
+.LoginButton.Register.Admin{
+    background-color: var(--color-border);
+    padding: 0.1em;
+    width: auto;
 }
 
-.message-input-area .LoginButton:disabled,
-.LoginButton.Register.Chat:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* ---- Botão ocultar admin ---- */
-.LoginButton.Register.Admin {
-    padding: var(--space-1) var(--space-2);
-    font-size: 10px;
-    height: auto;
-    min-width: auto;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: var(--radius-sm);
-    margin-top: var(--space-2);
-}
-
-.LoginButton.Register.Admin:hover {
-    background-color: rgba(0, 0, 0, 0.35);
-    transform: none;
-}
-
-/* ---- Responsive ---- */
+/* Responsividade básica para telas menores */
 @media (max-width: 768px) {
     .chat-container-wrapper {
-        margin: 0;
-        border-radius: 0;
-        height: calc(100vh - var(--header-height-mob));
-        max-height: none;
-        border: none;
-        box-shadow: none;
+        height: 90vh;
     }
 
     .message-bubble {
         max-width: 85%;
     }
-
     .messages-display-area {
-        padding: var(--space-3);
+        width: 80%;
+        max-height: 60vh;
+    }
+    .LoginButton.Register.Chat{
+        width: 5em;
     }
 }

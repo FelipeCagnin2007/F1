@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from '../context/AuthContext.jsx';
 import { Helmet } from 'react-helmet-async';
+import { f1ApiService } from "../services/f1ApiService.js";
 
 import "../styles/Page.css";
 import "../styles/FlipCard.css";
@@ -32,27 +33,8 @@ function Sprints() {
             setIsLoadingCurrentYearData(true);
             setCurrentYearError(null);
             try {
-                // Tenta carregar do cache primeiro (sessões não mudam com frequência)
-                const cacheKey = `f1SprintSessions_${year}`;
-                const cached = localStorage.getItem(cacheKey);
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    // Expira em 2 horas
-                    if (Date.now() - parsed.timestamp < 2 * 60 * 60 * 1000) {
-                        if (isMounted) {
-                            setCurrentYearSessions(parsed.data);
-                            setIsLoadingCurrentYearData(false);
-                        }
-                        return;
-                    }
-                }
-
-                // Se não tem cache válido, busca na API
-                const res = await fetch(`https://api.openf1.org/v1/sessions?year=${year}`);
-                if (res.status === 429) throw new Error("A API da F1 está sobrecarregada (Limite de requisições excedido). Tente novamente em alguns minutos.");
-                if (!res.ok) throw new Error("Erro de conexão com a API da Fórmula 1.");
+                const data = await f1ApiService.getSessionsForYear(year);
                 
-                const data = await res.json();
                 const relevantSessions = data.filter(
                     (session) => session.session_type === "Sprint" || session.session_name.includes("Sprint")
                 );
@@ -60,8 +42,6 @@ function Sprints() {
                 if (relevantSessions.length === 0) {
                     throw new Error(`Nenhuma Sprint encontrada para ${year}.`);
                 }
-
-                localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: relevantSessions }));
 
                 if (isMounted) {
                     setCurrentYearSessions(relevantSessions);
@@ -149,7 +129,6 @@ function Sprints() {
                                         <SessionCard
                                             key={session.session_key}
                                             session={session}
-                                            fastestLapData={currentYearFastestLaps[session.session_key]}
                                             flippedCardKey={flippedCardKey}
                                             setFlippedCardKey={setFlippedCardKey}
                                         />

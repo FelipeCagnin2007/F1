@@ -2,48 +2,14 @@ import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import Loading from "../components/Loading.jsx";
 import SessionCard from "../components/SessionCard.jsx";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from '../context/AuthContext.jsx';
 import { Helmet } from 'react-helmet-async';
+import { f1ApiService } from "../services/f1ApiService.js";
 
 import "../styles/Page.css";
 import "../styles/FlipCard.css";
-
-// --- Funções Auxiliares de API e Cache (MANTENHA AS MESMAS) ---
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-async function fetchWithRetry(url, retries = 5, initialDelayMs = 1000) {
-    let currentDelay = initialDelayMs;
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await fetch(url);
-            if (response.status === 429) {
-                console.warn(
-                    `[API Warning] Rate limit hit for ${url}. Retrying in ${currentDelay}ms... (Attempt ${i + 1}/${retries})`
-                );
-                await delay(currentDelay);
-                currentDelay = Math.min(currentDelay * 2, 8000);
-                continue;
-            }
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status} for ${url}`);
-            }
-            return response.json();
-        } catch (error) {
-            console.error(
-                `[API Error] Failed to fetch ${url} (Attempt ${i + 1}/${retries}):`,
-                error
-            );
-            if (i === retries - 1) {
-                throw error;
-            }
-            await delay(currentDelay);
-            currentDelay = Math.min(currentDelay * 2, 8000);
-        }
-    }
-    return null;
-}
 
 // --- Componente Qualifying ---
 
@@ -56,7 +22,6 @@ function Qualifying() {
     });
 
     const [currentYearSessions, setCurrentYearSessions] = useState([]);
-    const [allQualifyingFastestLapsData, setAllQualifyingFastestLapsData] = useState({});
     const [isLoadingCurrentYearData, setIsLoadingCurrentYearData] = useState(true);
     const [currentYearError, setCurrentYearError] = useState(null);
     const [flippedCardKey, setFlippedCardKey] = useState(null);
@@ -67,24 +32,7 @@ function Qualifying() {
             setIsLoadingCurrentYearData(true);
             setCurrentYearError(null);
             try {
-                const cacheKey = `f1QualifyingSessions_${year}`;
-                const cached = localStorage.getItem(cacheKey);
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    if (Date.now() - parsed.timestamp < 2 * 60 * 60 * 1000) {
-                        if (isMounted) {
-                            setCurrentYearSessions(parsed.data);
-                            setIsLoadingCurrentYearData(false);
-                        }
-                        return;
-                    }
-                }
-
-                const res = await fetch(`https://api.openf1.org/v1/sessions?year=${year}`);
-                if (res.status === 429) throw new Error("A API da F1 está sobrecarregada (Limite de requisições excedido). Tente novamente em alguns minutos.");
-                if (!res.ok) throw new Error("Erro de conexão com a API da Fórmula 1.");
-                
-                const data = await res.json();
+                const data = await f1ApiService.getSessionsForYear(year);
                 
                 const relevantSessions = data.filter(
                     (session) => session.session_type === "Qualifying" || session.session_name.includes("Qualifying")
@@ -93,8 +41,6 @@ function Qualifying() {
                 if (relevantSessions.length === 0) {
                     throw new Error(`Nenhuma Qualificação encontrada para ${year}.`);
                 }
-
-                localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: relevantSessions }));
 
                 if (isMounted) {
                     setCurrentYearSessions(relevantSessions);
@@ -179,7 +125,6 @@ function Qualifying() {
                                         <SessionCard
                                             key={session.session_key}
                                             session={session}
-                                            fastestLapData={currentYearFastestLaps[session.session_key]}
                                             flippedCardKey={flippedCardKey}
                                             setFlippedCardKey={setFlippedCardKey}
                                         />

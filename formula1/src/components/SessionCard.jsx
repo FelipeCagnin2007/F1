@@ -1,4 +1,5 @@
 import { memo, useState, useEffect } from "react";
+import { f1ApiService } from "../services/f1ApiService.js";
 
 // Formata segundos em MM:SS.mmm
 const formatLapTime = (seconds) => {
@@ -29,21 +30,10 @@ const SessionCard = memo(({ session, flippedCardKey, setFlippedCardKey }) => {
             
             const fetchBestLapData = async () => {
                 try {
-                    // Busca todas as voltas da sessão
-                    const lapsRes = await fetch(`https://api.openf1.org/v1/laps?session_key=${session.session_key}&lap_duration>=0`);
-                    if (lapsRes.status === 429) throw new Error("Rate Limit Excedido");
-                    if (!lapsRes.ok) throw new Error("Erro de rede");
+                    const isRace = session.session_type === "Race" || session.session_name.includes("Race");
+                    const data = await f1ApiService.getFastestLapForSession(session.session_key, isRace);
                     
-                    const laps = await lapsRes.json();
-                    
-                    let fastestLap = null;
-                    for (const lap of laps) {
-                        if (lap.lap_duration && (fastestLap === null || lap.lap_duration < fastestLap.lap_duration)) {
-                            fastestLap = lap;
-                        }
-                    }
-                    
-                    if (!fastestLap) {
+                    if (!data) {
                         if (isMounted) {
                             setFastestLapData({ driverName: "Tempo não disponível", lapTime: 0, teamColour: "E10600" });
                             setLoadingLap(false);
@@ -51,19 +41,8 @@ const SessionCard = memo(({ session, flippedCardKey, setFlippedCardKey }) => {
                         return;
                     }
 
-                    // Busca o nome e cor do piloto
-                    const driverRes = await fetch(`https://api.openf1.org/v1/drivers?driver_number=${fastestLap.driver_number}&session_key=${session.session_key}`);
-                    const driverData = await driverRes.json();
-                    
-                    const driverName = driverData && driverData.length > 0 ? driverData[0].broadcast_name : "Desconhecido";
-                    const teamColour = driverData && driverData.length > 0 ? driverData[0].team_colour : "666666";
-
                     if (isMounted) {
-                        setFastestLapData({
-                            driverName,
-                            lapTime: fastestLap.lap_duration,
-                            teamColour
-                        });
+                        setFastestLapData(data);
                         setLoadingLap(false);
                     }
                 } catch (err) {
@@ -79,7 +58,8 @@ const SessionCard = memo(({ session, flippedCardKey, setFlippedCardKey }) => {
             
             return () => { isMounted = false; };
         }
-    }, [isFlipped, fastestLapData, session.session_key, loadingLap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isFlipped, session.session_key]);
 
     const teamColour = fastestLapData?.teamColour || "E10600";
 
